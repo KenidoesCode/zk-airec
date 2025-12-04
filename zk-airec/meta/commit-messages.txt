@@ -1,0 +1,6 @@
+feat(circuits): add group classifier circuit with range checks
+chore(circuits): add build.sh to compile circuits and export verifier
+feat(prover): add proof_generator.js and sample inputs
+feat(contracts): add zkVerifierManager manager contract
+chore(deploy): add deploy script for local hardhat
+docs: add zk-design.md with security notes

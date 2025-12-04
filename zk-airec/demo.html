@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>zk-AI-Rec Demo</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 24px; }
+        input { margin: 8px 0; }
+        button { padding: 12px; font-size: 16px; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        function App() {
+            const [status, setStatus] = useState('idle');
+            const [age, setAge] = useState(25);
+            const [pref, setPref] = useState(1);
+
+            const generateAndSubmit = async () => {
+                setStatus('generating proof...');
+                try {
+                    const response = await fetch('http://localhost:5000/submit-proof', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ age: Number(age), pref: Number(pref) })
+                    });
+                    const data = await response.json();
+                    if (data.ok) {
+                        setStatus(`Proof submitted! Group: ${data.group}, Tx: ${data.txHash}`);
+                    } else {
+                        setStatus('error: ' + data.error);
+                    }
+                } catch (err) {
+                    setStatus('error: ' + err.message);
+                }
+            };
+
+            return (
+                <div>
+                    <h1>zk-AI-Rec — Demo</h1>
+                    <p>Generate ZK proof for user input and submit to the on-chain verifier (mock demo).</p>
+                    <div>
+                        <label>Age: <input type="number" value={age} onChange={(e) => setAge(e.target.value)} /></label>
+                    </div>
+                    <div>
+                        <label>Preference (0 or 1): <input type="number" min="0" max="1" value={pref} onChange={(e) => setPref(e.target.value)} /></label>
+                    </div>
+                    <button onClick={generateAndSubmit}>Generate Proof & Submit</button>
+                    <div>{status}</div>
+                </div>
+            );
+        }
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>
